@@ -298,6 +298,11 @@ MonoBehaviour:
   acceleration: 50
   maxSpeed: 30
   turnSpeed: 5
+  jumpForce: 3
+  groundCheckDistance: 0.3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -669,6 +674,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 3da5840b5d838524cb0128fbccf00053, type: 3}
       propertyPath: m_Name
       value: Road Lane Bus Stop
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 3da5840b5d838524cb0128fbccf00053, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 3da5840b5d838524cb0128fbccf00053, type: 3}
       propertyPath: m_LocalPosition.x
