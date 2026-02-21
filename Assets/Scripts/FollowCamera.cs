@@ -4,21 +4,33 @@ public class FollowCamera : MonoBehaviour
 {
     public Transform target;
 
-    [Header("Positioning")]
-    public Vector3 offset = new Vector3(0f, 5f, -8f);
+    [Header("Offsets")]
+    public Vector3 backOffset = new Vector3(0f, 4f, -6f);
+    public Vector3 frontOffset = new Vector3(0f, 4f, 6f);
+
     public float smoothSpeed = 8f;
+
+    private bool frontView = false;
+
+    void Update()
+    {
+        // Press C to toggle camera
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            frontView = !frontView;
+        }
+    }
 
     void LateUpdate()
     {
         if (!target) return;
 
-        // Desired position behind the player
-        Vector3 desiredPosition = target.position + target.TransformDirection(offset);
+        Vector3 chosenOffset = frontView ? frontOffset : backOffset;
 
-        // Smoothly move camera
+        Vector3 desiredPosition = target.position + target.TransformDirection(chosenOffset);
+
         transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
 
-        // Always look at fish
-        transform.LookAt(target.position + Vector3.up * 1.0f);
+        transform.LookAt(target.position + Vector3.up * 1.2f);
     }
 }
