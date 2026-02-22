@@ -8,8 +8,12 @@ public class CopChaseAI : MonoBehaviour
     public Transform waypointsParent;
 
     [Header("Movement")]
-    public float moveSpeed = 8f;
+    public float moveSpeed = 10f;
     public float turnSpeed = 6f;
+    public float acceleration = 25f;
+
+    [Header("Chase Settings")]
+    public float directChaseDistance = 6f;
 
     [Header("Path Settings")]
     public float nodeReachDistance = 0.8f;
@@ -24,9 +28,11 @@ public class CopChaseAI : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         rb.useGravity = true;
-        rb.isKinematic = false;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        rb.centerOfMass = new Vector3(0, -0.5f, 0);
 
         RecalculatePath();
     }
@@ -35,45 +41,70 @@ public class CopChaseAI : MonoBehaviour
     {
         if (!target) return;
 
-        // Only recalculate when path is finished
-        if (currentPath == null || currentPathIndex >= currentPath.Count)
+        Vector3 desiredDirection;
+
+        float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+        if (distanceToTarget < directChaseDistance)
         {
-            RecalculatePath();
+            desiredDirection = GetDirectChaseDirection();
+        }
+        else
+        {
+            if (currentPath == null || currentPathIndex >= currentPath.Count)
+                RecalculatePath();
+
+            desiredDirection = GetPathDirection();
         }
 
-        FollowPath();
+        ApplyMovement(desiredDirection);
     }
 
-    void FollowPath()
+    Vector3 GetPathDirection()
     {
         if (currentPath == null || currentPathIndex >= currentPath.Count)
-            return;
+            return transform.forward;
 
-        Vector3 targetPos = currentPath[currentPathIndex].transform.position;
-        Vector3 toTarget = targetPos - transform.position;
-        toTarget.y = 0f;
+        Vector3 nodeTarget = currentPath[currentPathIndex].transform.position;
+        Vector3 toNode = nodeTarget - transform.position;
+        toNode.y = 0f;
 
-        float distance = toTarget.magnitude;
-
-        if (distance < nodeReachDistance)
+        if (toNode.magnitude < nodeReachDistance)
         {
             currentPathIndex++;
-            return;
+            return transform.forward;
         }
 
-        Vector3 direction = toTarget.normalized;
+        return toNode.normalized;
+    }
 
-        // Smooth rotation
+    Vector3 GetDirectChaseDirection()
+    {
+        Vector3 toTarget = target.position - transform.position;
+        toTarget.y = 0f;
+        return toTarget.normalized;
+    }
+
+    void ApplyMovement(Vector3 direction)
+    {
+        if (direction == Vector3.zero)
+            return;
+
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
 
-        // Move only if facing mostly toward target
         float alignment = Vector3.Dot(transform.forward, direction);
 
-        if (alignment > 0.6f)
+        if (alignment > 0.5f)
         {
-            Vector3 newPosition = rb.position + transform.forward * moveSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(newPosition);
+            if (rb.velocity.magnitude < moveSpeed)
+            {
+                rb.AddForce(transform.forward * acceleration, ForceMode.Acceleration);
+            }
+        }
+        else
+        {
+            rb.velocity *= 0.9f;
         }
     }
 
@@ -109,7 +140,7 @@ public class CopChaseAI : MonoBehaviour
         return closest;
     }
 
-    // ---------------- A* SEARCH ----------------
+    // -------- A* --------
 
     List<WaypointNode> FindPath(WaypointNode start, WaypointNode goal)
     {
