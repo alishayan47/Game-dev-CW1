@@ -4,42 +4,41 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Rigidbody))]
 public class CopChaseAI2 : MonoBehaviour
 {
-    public Transform target;              // Player target
-    public Transform waypointsParent;     // Parent object containing cop nodes
+    public Transform target;               // Player transform
+    public Transform waypointsParent;      // Parent containing cop nodes
 
     [Header("Movement")]
-    public float moveSpeed = 10f;         // Max forward speed
-    public float turnSpeed = 6f;          // Rotation smoothness
-    public float acceleration = 25f;      // Forward acceleration force
+    public float moveSpeed = 10f;          // Maximum forward speed
+    public float turnSpeed = 6f;           // Rotation smoothing
+    public float acceleration = 25f;       // Acceleration force
 
     [Header("Chase Settings")]
-    public float directChaseDistance = 6f; // Distance at which cop ignores path and chases directly
+    public float directChaseDistance = 6f; // Switch to direct chase under this distance
+    public float repathDistanceThreshold = 6f; // How far target must shift before repathing
 
     [Header("Path Settings")]
-    public float nodeReachDistance = 0.8f; // Distance required to consider node "reached"
+    public float nodeReachDistance = 0.8f; // Distance to consider a node reached
 
     private Rigidbody rb;
 
-    // Current A* path and position in that path
     private List<WaypointNode2> currentPath = new List<WaypointNode2>();
     private int currentPathIndex = 0;
 
-    // Tracks whether we are currently direct chasing
+    private WaypointNode2 lastGoalNode;    // Used to prevent goal flipping
     private bool isDirectChasing = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
 
-        // Rigidbody stability settings
+        // Physics stability configuration
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         rb.centerOfMass = new Vector3(0, -0.5f, 0);
 
-        // Initial path calculation
-        ForceRepath();
+        RecalculatePath(); // Initial path
     }
 
     void FixedUpdate()
@@ -48,36 +47,50 @@ public class CopChaseAI2 : MonoBehaviour
 
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-        // -------- DIRECT CHASE MODE --------
+        // ---------------- DIRECT CHASE MODE ----------------
         if (distanceToTarget < directChaseDistance)
         {
             isDirectChasing = true;
             ApplyMovement(GetDirectChaseDirection());
             return;
         }
-        else
+
+        // If we exit direct chase, force a fresh path
+        if (isDirectChasing)
         {
-            // If we were direct chasing and now exited range,
-            // we must recalculate a clean path from current position
-            if (isDirectChasing)
+            isDirectChasing = false;
+            RecalculatePath();
+        }
+
+        // ---------------- SMART REPATHE CONTROL ----------------
+
+        WaypointNode2 currentGoalNode = GetClosestNode(target.position);
+
+        if (currentGoalNode != null && lastGoalNode != null)
+        {
+            float goalShift = Vector3.Distance(
+                currentGoalNode.transform.position,
+                lastGoalNode.transform.position);
+
+            // Only repath if:
+            // 1) Player moved significantly
+            // 2) Cop has already progressed in its path (prevents early jitter)
+            if (goalShift > repathDistanceThreshold && currentPathIndex > 1)
             {
-                isDirectChasing = false;
-                ForceRepath();
+                RecalculatePath();
             }
         }
 
-        // -------- PATH FOLLOWING MODE --------
-
-        // Only repath when path is finished or invalid
+        // If path ended or invalid
         if (currentPath == null || currentPathIndex >= currentPath.Count)
         {
-            ForceRepath();
+            RecalculatePath();
         }
 
         ApplyMovement(GetPathDirection());
     }
 
-    // Determines direction while following A* path
+    // Returns direction toward current path node
     Vector3 GetPathDirection()
     {
         if (currentPath == null || currentPathIndex >= currentPath.Count)
@@ -87,7 +100,7 @@ public class CopChaseAI2 : MonoBehaviour
         Vector3 toNode = nodeTarget - transform.position;
         toNode.y = 0f;
 
-        // Only advance node if not final node
+        // Advance node when close enough
         if (toNode.magnitude < nodeReachDistance && currentPathIndex < currentPath.Count - 1)
         {
             currentPathIndex++;
@@ -97,7 +110,7 @@ public class CopChaseAI2 : MonoBehaviour
         return toNode.normalized;
     }
 
-    // Direct pursuit direction (ignores graph)
+    // Returns direct pursuit direction
     Vector3 GetDirectChaseDirection()
     {
         Vector3 toTarget = target.position - transform.position;
@@ -105,41 +118,31 @@ public class CopChaseAI2 : MonoBehaviour
         return toTarget.normalized;
     }
 
-    // Handles rotation and forward acceleration
+    // Handles smooth rotation and forward movement
     void ApplyMovement(Vector3 direction)
     {
         if (direction == Vector3.zero)
             return;
 
-        // Smooth rotation toward movement direction
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
 
         float alignment = Vector3.Dot(transform.forward, direction);
 
-        // Lowered alignment threshold prevents freeze at small angles
+        // Allow movement even with mild turning
         if (alignment > 0.2f)
         {
             if (rb.velocity.magnitude < moveSpeed)
-            {
                 rb.AddForce(transform.forward * acceleration, ForceMode.Acceleration);
-            }
         }
         else
         {
-            // Slight slow down if turning sharply
-            rb.velocity *= 0.95f;
-        }
-
-        // Anti-stuck assist: small boost if almost stopped
-        if (rb.velocity.magnitude < 0.5f)
-        {
-            rb.AddForce(transform.forward * (acceleration * 0.5f), ForceMode.Acceleration);
+            rb.velocity *= 0.95f; // Mild braking when turning sharply
         }
     }
 
-    // Forces recalculation of A* path
-    void ForceRepath()
+    // Recalculate A* path from current position to player's closest node
+    void RecalculatePath()
     {
         WaypointNode2 startNode = GetClosestNode(transform.position);
         WaypointNode2 goalNode = GetClosestNode(target.position);
@@ -152,9 +155,10 @@ public class CopChaseAI2 : MonoBehaviour
 
         currentPath = FindPath(startNode, goalNode);
         currentPathIndex = 0;
+        lastGoalNode = goalNode;
     }
 
-    // Finds closest node to a world position
+    // Finds nearest node in graph
     WaypointNode2 GetClosestNode(Vector3 position)
     {
         WaypointNode2 closest = null;
@@ -176,7 +180,7 @@ public class CopChaseAI2 : MonoBehaviour
         return closest;
     }
 
-    // -------- A* SEARCH --------
+    // ---------------- A* SEARCH ----------------
 
     List<WaypointNode2> FindPath(WaypointNode2 start, WaypointNode2 goal)
     {
@@ -193,12 +197,9 @@ public class CopChaseAI2 : MonoBehaviour
         {
             WaypointNode2 current = openSet[0];
 
-            // Find lowest F score in open set
             foreach (var node in openSet)
-            {
                 if (GetFScore(node, goal, gScore) < GetFScore(current, goal, gScore))
                     current = node;
-            }
 
             if (current == goal)
                 return ReconstructPath(cameFrom, current);
