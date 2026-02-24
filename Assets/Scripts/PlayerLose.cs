@@ -2,13 +2,25 @@ using UnityEngine;
 
 public class PlayerLose : MonoBehaviour
 {
+    [Header("Fall Death Settings")]
+    public float fallDeathY = -10f;
+
     private bool hasLost = false;
     private Rigidbody rb;
 
     void Start()
     {
-        Time.timeScale = 1f;
         rb = GetComponent<Rigidbody>();
+    }
+
+    void Update()
+    {
+        if (hasLost) return;
+
+        if (transform.position.y < fallDeathY)
+        {
+            LoseGame();
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -26,11 +38,11 @@ public class PlayerLose : MonoBehaviour
     {
         hasLost = true;
 
-        // Stop player movement
+        // Stop movement
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        // Disable all movement scripts on player
+        // Disable other player scripts
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
@@ -38,9 +50,15 @@ public class PlayerLose : MonoBehaviour
                 script.enabled = false;
         }
 
-        // Freeze entire game
-        Time.timeScale = 0f;
-
         Debug.Log("YOU LOST");
+
+        // Show UI
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.ShowLosePanel();
+        }
+
+        // Pause game AFTER panel shows
+        Time.timeScale = 0f;
     }
 }
