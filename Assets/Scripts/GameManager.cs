@@ -5,22 +5,33 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    [Header("Score")]
     public int currentScore = 0;
     public int targetScore = 5;
 
-    private void Awake()
+    void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
-            Destroy(gameObject);
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+
+        // Safety: make sure the level is not stuck paused
+        Time.timeScale = 1f;
+    }
+
+    void Start()
+    {
+        // Show initial score immediately (0/target)
+        if (UIManager.instance != null)
+            UIManager.instance.UpdateScore(currentScore, targetScore);
     }
 
     public void AddScore(int amount)
     {
         currentScore += amount;
+        Debug.Log("SCORE: " + currentScore);
 
-        Debug.Log("Score: " + currentScore);
+        if (UIManager.instance != null)
+            UIManager.instance.UpdateScore(currentScore, targetScore);
 
         if (currentScore >= targetScore)
         {
@@ -30,12 +41,14 @@ public class GameManager : MonoBehaviour
 
     void WinGame()
     {
-        Debug.Log("YOU WIN!");
+        Debug.Log("YOU WIN");
 
-        // Option 1: Freeze time
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.ShowWinPanel();
+        }
+
         Time.timeScale = 0f;
-
-        // Option 2 (later): Load win screen scene
-        // SceneManager.LoadScene("WinScene");
     }
+
 }
