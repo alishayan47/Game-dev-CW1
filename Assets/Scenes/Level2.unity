@@ -4032,7 +4032,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 13
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -9420,13 +9420,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 12
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 6
-  nodeReachDistance: 0.6
 --- !u!114 &325667843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9441,7 +9434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 11
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -14699,7 +14692,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 16
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -14765,13 +14758,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 12
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 10
-  nodeReachDistance: 0.6
 --- !u!1 &490058565
 GameObject:
   m_ObjectHideFlags: 0
@@ -17703,13 +17689,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 12
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 10
-  nodeReachDistance: 0.6
 --- !u!114 &590393392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17724,7 +17703,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 15
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -25235,13 +25214,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 10
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 6
-  nodeReachDistance: 0.7
 --- !u!114 &836862412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25256,7 +25228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 16
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -32735,7 +32707,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 12
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -49062,7 +49034,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 13
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -49441,13 +49413,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 12
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 6
-  nodeReachDistance: 0.6
 --- !u!114 &1614524621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49462,7 +49427,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 10
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10
@@ -50031,13 +49996,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64454e32452174a4494919987d798bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 641194995}
-  waypointsParent: {fileID: 0}
-  moveSpeed: 9
-  turnSpeed: 5
-  acceleration: 25
-  directChaseDistance: 6
-  nodeReachDistance: 0.7
 --- !u!114 &1637173437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50052,7 +50010,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 641194995}
   waypointsParent: {fileID: 41673012}
-  moveSpeed: 9
+  moveSpeed: 20
   turnSpeed: 6
   acceleration: 25
   directChaseDistance: 10

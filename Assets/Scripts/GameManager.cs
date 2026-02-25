@@ -11,10 +11,12 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (instance == null) 
+            instance = this;
+        else 
+            Destroy(gameObject);
 
-        // Safety: make sure the level is not stuck paused
+        // make sure the level is not stuck paused
         Time.timeScale = 1f;
     }
 

@@ -1,64 +1,57 @@
 using UnityEngine;
 
-public class PlayerLose : MonoBehaviour
+public class PlayerLose : MonoBehaviour 
 {
-    [Header("Fall Death Settings")]
-    public float fallDeathY = -10f;
+    public float fallDeathY = -10f; // Y-position threshold below which the player loses 
 
-    private bool hasLost = false;
-    private Rigidbody rb;
+    private bool hasLost = false; 
+    private Rigidbody rb; 
 
-    void Start()
+    void Start() 
     {
         rb = GetComponent<Rigidbody>();
     }
 
-    void Update()
+    void Update() 
     {
-        if (hasLost) return;
+        if (hasLost) 
+            return; // Stops further checks if the player has already lost
 
-        if (transform.position.y < fallDeathY)
+        if (transform.position.y < fallDeathY) // Checks if player has fallen below allowed Y limit
         {
-            LoseGame();
+            LoseGame(); // Triggers loss if player falls off the map
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision) 
     {
-        if (hasLost) return;
+        if (hasLost) 
+            return; // Prevents repeated loss triggers
 
-        if (collision.collider.CompareTag("Cop") ||
-            collision.collider.CompareTag("Traffic"))
+        if (collision.collider.CompareTag("Cop") || collision.collider.CompareTag("Traffic"))
         {
-            LoseGame();
+            // Checks if collided object is a Cop or Traffic using tags
+            LoseGame(); // Triggers loss on collision with those objects
         }
     }
 
-    void LoseGame()
+    void LoseGame() // all logic that occurs when player loses
     {
-        hasLost = true;
+        hasLost = true; // to prevent re entry into this function
 
-        // Stop movement
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero; // Immediately stops all linear movement
+        rb.angularVelocity = Vector3.zero; // stops all rotational movement
 
-        // Disable other player scripts
-        MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
-        foreach (MonoBehaviour script in scripts)
-        {
-            if (script != this)
-                script.enabled = false;
-        }
 
-        Debug.Log("YOU LOST");
+        Debug.Log("YOU LOST"); //  for debugging purposes
 
-        // Show UI
-        if (UIManager.instance != null)
+        if (UIManager.instance != null) // Ensures UIManager exists before calling it
         {
             UIManager.instance.ShowLosePanel();
+            // Displays the lose UI panel on screen
         }
 
-        // Pause game AFTER panel shows
         Time.timeScale = 0f;
+        // Pauses the entire game by stopping time progression
     }
 }
