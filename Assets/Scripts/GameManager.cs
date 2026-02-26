@@ -16,13 +16,13 @@ public class GameManager : MonoBehaviour
         else 
             Destroy(gameObject);
 
-        // make sure the level is not stuck paused
+        // making sure the level is not stuck paused
         Time.timeScale = 1f;
     }
 
     void Start()
     {
-        // Show initial score immediately (0/target)
+        // to show initial score immediately (0/target)
         if (UIManager.instance != null)
             UIManager.instance.UpdateScore(currentScore, targetScore);
     }
