@@ -50,7 +50,7 @@ public class CopChaseAI2 : MonoBehaviour
             return;           // Skip A* logic this frame
         }
 
-        // To EXIT Direct Chase mode
+        // To exit Direct Chase mode
         if (isDirectChasing)    // If we were chasing but now player is far
         {
             isDirectChasing = false;  // Exit direct chase mode
@@ -143,7 +143,7 @@ public class CopChaseAI2 : MonoBehaviour
         }
         else
         {
-            rb.velocity *= 0.9f;       // Slight braking when turning sharply
+            rb.velocity *= 0.9f;       // Slight braking when turning sharply // again to avoid the donut bug
         }
 
         rb.angularVelocity = Vector3.ClampMagnitude(rb.angularVelocity, 3f); // Prevent excessive spinning (ANother strategy to avoid donuts)
@@ -164,11 +164,13 @@ public class CopChaseAI2 : MonoBehaviour
         currentPathIndex = 0;     // Reset path index
         lastGoalNode = goalNode;   // Updating tracking goal
 
-        if (currentPath != null && currentPath.Count > 1)
+        if (currentPath != null && currentPath.Count > 1) //no point in skipping if there's only one node
         {
             Vector3 toFirst = currentPath[0].transform.position - transform.position;
             toFirst.y = 0f;
 
+            //this was important during debugging. Cause when the cops were snapping back to the path
+            //if the node was behind them, it caused an unneccessary collision with the cop right behind them
             float dot = Vector3.Dot(transform.forward, toFirst.normalized); // Check if node is behind
 
             if (dot < 0f)             // If node is behind us
